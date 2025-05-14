@@ -287,20 +287,7 @@
   border-radius: 8px;
   display: none;
 }
-.video-loader {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1.2rem;
-  z-index: 10001;
-}
-.video-loader.hidden { display: none; }
-.h { position: relative; }  /* ensure loader sits on top */
+
 </style>
 <body class="fullscreen-active">
     <script>
@@ -571,10 +558,10 @@ document.addEventListener('DOMContentLoaded', () => {
   height: 100vh;
   object-fit: cover;
   z-index: 9999;">
-   <!-- ▶ VIDEO LOADER -->
-  <div id="videoLoader" class="video-loader">Loading video…</div>
+ 
    <video id="fullscreenVideo" src="dilisha.mp4" playsinline></video>
   <button id="playVideoBtn">Play Video</button>
+
 <script>
   // Grab your elements
   const video   = document.getElementById("fullscreenVideo");
@@ -615,26 +602,19 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err=> alert("Playback failed: " + err));
   });
 
-  // grab the loader div
-const loader = document.getElementById('videoLoader');
+  // Watch for your .h panel becoming “.active” – then fire the video
+  new MutationObserver(muts => {
+    muts.forEach(m => {
+      if (m.attributeName === "class" && hDiv.classList.contains("active")) {
+        showVideoSection();
+      }
+    });
+  }).observe(hDiv, { attributes: true });
 
-// on panel-enter: show loader 2s then hide + fire showVideoSection
-new MutationObserver(muts => {
-  muts.forEach(m => {
-    if (m.attributeName === 'class' && hDiv.classList.contains('active')) {
-      loader.classList.remove('hidden');
-      setTimeout(() => loader.classList.add('hidden'), 2000);
-      showVideoSection();
-    }
-  });
-}).observe(hDiv, { attributes: true });
-
-// network stall / buffering → show loader; resume/play → hide
-video.addEventListener('waiting', () => loader.classList.remove('hidden'));
-video.addEventListener('playing', () => loader.classList.add('hidden'));
-video.addEventListener('canplay',  () => loader.classList.add('hidden'));
-
+  // Keep the video container hidden until it’s truly needed
+  hDiv.style.display = "none";
 </script>
+
 
 
 </div>
